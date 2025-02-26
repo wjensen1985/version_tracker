@@ -24,16 +24,16 @@ export async function fetchProjectItems(project_id: string) {
     try {
         const items = await sql`
           SELECT *
-          FROM items
-          JOIN projects p ON items.project_id = p.id
+          FROM items i
+          JOIN projects p ON i.project_id = p.id
           WHERE p.id = ${project_id};
         `;
     
         return items.rows;
-      } catch (error) {
+    } catch (error) {
         console.error('Database Error:', error);
         throw new Error('Failed to fetch project items.');
-      }
+    }
 }
     
 export async function fetchItemVersionHistory(item_id: string) {
@@ -46,8 +46,8 @@ export async function fetchItemVersionHistory(item_id: string) {
         `;
     
         return item_version_history.rows;
-        } catch (error) {
+    } catch (error) {
         console.error('Database Error:', error);
         throw new Error('Failed to fetch item version history.');
-        }   
+    }   
 }

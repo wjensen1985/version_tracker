@@ -20,7 +20,7 @@ export async function fetchUserProjects(user_id: string) {
     }
 }
 
-export async function  fetchProjectItems(project_id: string) {
+export async function fetchProjectItems(project_id: string) {
     try {
         const items = await sql`
           SELECT *
@@ -34,4 +34,20 @@ export async function  fetchProjectItems(project_id: string) {
         console.error('Database Error:', error);
         throw new Error('Failed to fetch project items.');
       }
-}
+    }
+    
+    export async function fetchItemVersionHistory(item_id: string) {
+        try {
+            const item_version_history = await sql`
+              SELECT *
+              FROM item_versions iv
+              JOIN items i ON iv.item_id = i.id
+              WHERE i.id = ${item_id};
+            `;
+        
+            return item_version_history.rows;
+          } catch (error) {
+            console.error('Database Error:', error);
+            throw new Error('Failed to fetch item version history.');
+          }   
+    }

@@ -1,5 +1,7 @@
-import { fetchUserProjects, fetchProjectItems, fetchItemVersionHistory } from "../lib/data";
+import { fetchUserProjects, fetchProjectItems, fetchItemVersionHistory } from '../../lib/data';
 
+
+//dashboard Home (my recent projects/search_all/create)
 export default async function Dashboard() {
     const test_user_id = 1;
     const projects = await fetchUserProjects(test_user_id.toString());

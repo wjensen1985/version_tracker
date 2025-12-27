@@ -1,1 +1,0 @@
-// page to view items in project

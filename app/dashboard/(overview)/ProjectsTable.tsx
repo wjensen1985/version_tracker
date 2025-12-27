@@ -1,7 +1,6 @@
-"use client";
-
 import Link from "next/link";
 import type { Project } from "@/app/lib/definitions";
+import ConfirmDeleteButton from "@/app/components/ConfirmDeleteButton";
 
 function formatDate(iso: string) {
   const d = new Date(iso);
@@ -15,7 +14,13 @@ function formatDate(iso: string) {
   }).format(d);
 }
 
-export default function ProjectsTable({ projects }: { projects: Project[] }) {
+export default function ProjectsTable({
+  projects,
+  deleteProjectAction,
+}: {
+  projects: Project[];
+  deleteProjectAction: (formData: FormData) => Promise<void>;
+}) {
   if (!projects?.length) {
     return (
       <div className="rounded-xl border bg-white p-6">
@@ -38,9 +43,7 @@ export default function ProjectsTable({ projects }: { projects: Project[] }) {
       <div className="flex items-center justify-between p-4">
         <div>
           <h2 className="text-lg font-semibold">Projects</h2>
-          <p className="text-sm text-gray-600">
-            {projects.length} total
-          </p>
+          <p className="text-sm text-gray-600">{projects.length} total</p>
         </div>
 
         <Link
@@ -66,10 +69,7 @@ export default function ProjectsTable({ projects }: { projects: Project[] }) {
             {projects.map((p) => (
               <tr key={p.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium text-gray-900">
-                  <Link
-                    className="hover:underline"
-                    href={`/dashboard/projects/${p.id}`}
-                  >
+                  <Link className="hover:underline" href={`/dashboard/projects/${p.id}`}>
                     {p.name}
                   </Link>
                 </td>
@@ -78,17 +78,22 @@ export default function ProjectsTable({ projects }: { projects: Project[] }) {
                   {p.description?.trim() ? p.description : <span className="text-gray-400">—</span>}
                 </td>
 
-                <td className="px-4 py-3 text-gray-700">
-                  {formatDate(p.created_at)}
-                </td>
+                <td className="px-4 py-3 text-gray-700">{formatDate(p.created_at)}</td>
 
                 <td className="px-4 py-3 text-right">
-                  <Link
-                    href={`/dashboard/projects/${p.id}`}
-                    className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
-                  >
-                    Open
-                  </Link>
+                  <div className="flex justify-end gap-2">
+                    <Link
+                      href={`/dashboard/projects/${p.id}`}
+                      className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
+                    >
+                      Open
+                    </Link>
+
+                    <form action={deleteProjectAction}>
+                      <input type="hidden" name="projectId" value={p.id} />
+                      <ConfirmDeleteButton label="Delete" />
+                    </form>
+                  </div>
                 </td>
               </tr>
             ))}

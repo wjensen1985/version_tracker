@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { fetchProjectById, fetchProjectDashboard } from "@/app/lib/data";
+import { deleteItem, fetchProjectById, fetchProjectDashboard } from "@/app/lib/data";
 import type { ProjectItemRow } from "@/app/lib/definitions";
 import { getCurrentUserId } from "@/app/lib/auth";
-
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import ConfirmDeleteButton from "@/app/components/ConfirmDeleteButton";
 
 function fmt(iso: string | null) {
   if (!iso) return "—";
@@ -42,7 +44,22 @@ export default async function ProjectPage({
   }
 
   const items = await fetchProjectDashboard(projectId, userId);
-  console.log(items);
+  // console.log(items);
+
+  async function deleteItemAction(formData: FormData) {
+    "use server";
+
+    const userId = await getCurrentUserId();
+
+    const itemId = Number.parseInt(String(formData.get("itemId") ?? ""), 10);
+    if (!Number.isInteger(itemId)) {
+      throw new Error("Invalid item id");
+    }
+
+    await deleteItem(projectId, itemId, userId);
+    revalidatePath(`/dashboard/projects/${projectId}`);
+    redirect(`/dashboard/projects/${projectId}`);
+  }
 
   return (
     <div className="p-6">
@@ -106,19 +123,27 @@ export default async function ProjectPage({
                   <td className="px-4 py-3 text-gray-700">{it.current_version_details ?? "—"}</td>
                   <td className="px-4 py-3 text-gray-700">{fmt(it.current_version_updated_at)}</td>
                   <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/dashboard/projects/${projectId}/items/${it.id}`}
-                      className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
-                    >
-                      Open
-                    </Link>
+                    <div className="flex justify-end gap-2">
+                      <Link
+                        href={`/dashboard/projects/${projectId}/items/${it.id}`}
+                        className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
+                      >
+                        Open
+                      </Link>
+
+                      <form action={deleteItemAction}>
+                        <input type="hidden" name="itemId" value={it.id} />
+                        <ConfirmDeleteButton />
+                      </form>
+
+                    </div>
                   </td>
                 </tr>
               ))}
 
               {items.length === 0 ? (
                 <tr>
-                  <td className="px-4 py-6 text-sm text-gray-600" colSpan={5}>
+                  <td className="px-4 py-6 text-sm text-gray-600" colSpan={6}>
                     No items yet.
                   </td>
                 </tr>

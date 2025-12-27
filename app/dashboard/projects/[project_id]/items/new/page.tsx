@@ -64,7 +64,7 @@ export default async function NewItemPage({
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Item Type (Optional)</label>
+          <label className="block text-sm font-medium">Item Type</label>
           <input
             name="item_type"
             className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"

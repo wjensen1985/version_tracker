@@ -79,6 +79,7 @@ export default async function ItemPage({
                 <th className="px-4 py-3">Updated</th>
                 <th className="px-4 py-3">Details</th>
                 <th className="px-4 py-3">Current</th>
+                <th className="px-4 py-3">Actions</th>
               </tr>
             </thead>
 
@@ -108,13 +109,15 @@ export default async function ItemPage({
                         "—"
                       )}
                     </td>
+                    <td>
+                    </td>
                   </tr>
                 );
               })}
 
               {versions.length === 0 ? (
                 <tr>
-                  <td className="px-4 py-6 text-sm text-gray-600" colSpan={4}>
+                  <td className="px-4 py-6 text-sm text-gray-600" colSpan={5}>
                     No versions yet.
                   </td>
                 </tr>

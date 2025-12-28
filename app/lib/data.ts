@@ -1,5 +1,12 @@
 import { sql } from "./db";
-import type { Project, ProjectItemRow, ItemWithVersions, Item, ItemVersionRow } from "./definitions";
+import type {
+  Project,
+  ProjectItemRow,
+  HistoricProjectItemRow,
+  ItemWithVersions,
+  Item,
+  ItemVersionRow,
+} from "./definitions";
 
 export async function fetchUserProjects(
     user_id: number
@@ -117,6 +124,43 @@ export async function fetchItemWithVersions(
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch item version history.");
+  }
+}
+
+export async function fetchItemVersionById(versionId: string) {
+  try {
+    const rows = await sql`
+      SELECT id, item_id, version_number, details, updated_at
+      FROM item_versions
+      WHERE id = ${versionId}
+      LIMIT 1;
+    `;
+    return rows[0] ?? null;
+  } catch (err) {
+    console.error("fetchItemVersionById error:", err);
+    throw err;
+  }
+}
+
+export async function editItemVersion(params: {
+  versionId: string;
+  version_number: string;
+  details: string | null;
+}) {
+  try {
+    const rows = await sql`
+      UPDATE item_versions
+      SET
+        version_number = ${params.version_number},
+        details = ${params.details},
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ${params.versionId}
+      RETURNING id, item_id, version_number, details, updated_at;
+    `;
+    return rows[0] ?? null;
+  } catch (err) {
+    console.error("updateItemVersion error:", err);
+    throw err;
   }
 }
 
@@ -300,10 +344,51 @@ export async function fetchProjectDashboard(
   }
 }
 
+export async function fetchProjectDashboardAsOf(
+  projectId: number,
+  ownerUserId: number,
+  asOfIso: string
+) {
+  try {
+    const rows = await sql`
+      SELECT
+        i.id,
+        i.project_id,
+        i.name,
+        i.item_type,
+        iv.version_number AS historic_version,
+        iv.updated_at     AS historic_version_updated_at,
+        iv.details        AS historic_version_details
+      FROM projects p
+      JOIN items i
+        ON i.project_id = p.id
+      LEFT JOIN LATERAL (
+        SELECT
+          iv.version_number,
+          iv.updated_at,
+          iv.details
+        FROM item_versions iv
+        WHERE iv.item_id = i.id
+          AND iv.updated_at <= ${asOfIso}::timestamptz
+        ORDER BY iv.updated_at DESC, iv.id DESC
+        LIMIT 1
+      ) iv ON TRUE
+      WHERE p.id = ${projectId}
+        AND p.owner_user_id = ${ownerUserId}
+      ORDER BY i.id;
+    `;
+
+    return rows as HistoricProjectItemRow[];
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch project dashboard (historic).");
+  }
+}
+
 export async function fetchProjectById(
     projectId: number, 
     ownerUserId: number
-) {
+): Promise<Project> {
   try {
     const rows = await sql`
       SELECT id, name, description, created_at
@@ -313,10 +398,34 @@ export async function fetchProjectById(
       LIMIT 1;
     `;
 
-    if (rows.length === 0) return null;
+    if (rows.length === 0){
+      throw new Error("Project not found or access denied");
+    }
     return rows[0] as Project;
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch project.");
+  }
+}
+
+export async function editProject(
+  projectId: number,
+  userId: number,
+  patch: { name: string; description: string | null }
+) {
+  // This pattern prevents editing a project you don't own/have access to.
+  const rows = await sql/* sql */ `
+    UPDATE projects p
+    SET
+      name = ${patch.name},
+      description = ${patch.description}
+    FROM projects
+    WHERE p.id = ${projectId}
+      AND p.owner_user_id = ${userId}
+    RETURNING p.id;
+  `;
+
+  if (!rows[0]) {
+    throw new Error("Update failed (project not found or no access)");
   }
 }

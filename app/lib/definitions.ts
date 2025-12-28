@@ -15,6 +15,16 @@ export type ProjectItemRow = {
   current_version_details: string | null;
 };
 
+export type HistoricProjectItemRow = {
+  id: number;
+  project_id: number;
+  name: string;
+  item_type: string | null;
+  historic_version: string | null;
+  historic_version_updated_at: string | null; // ISO string
+  historic_version_details: string | null;
+};
+
 export type Item = {
   id: number;
   project_id: number;

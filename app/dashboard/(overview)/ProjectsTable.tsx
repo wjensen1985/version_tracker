@@ -89,6 +89,13 @@ export default function ProjectsTable({
                       Open
                     </Link>
 
+                    <Link
+                      href={`/dashboard/projects/${p.id}/edit`}
+                      className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
+                    >
+                      Edit
+                    </Link>
+
                     <form action={deleteProjectAction}>
                       <input type="hidden" name="projectId" value={p.id} />
                       <ConfirmDeleteButton label="Delete" />

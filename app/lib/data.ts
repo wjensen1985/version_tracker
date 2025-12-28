@@ -127,41 +127,70 @@ export async function fetchItemWithVersions(
   }
 }
 
-export async function fetchItemVersionById(versionId: string) {
-  try {
-    const rows = await sql`
-      SELECT id, item_id, version_number, details, updated_at
-      FROM item_versions
-      WHERE id = ${versionId}
-      LIMIT 1;
-    `;
-    return rows[0] ?? null;
-  } catch (err) {
-    console.error("fetchItemVersionById error:", err);
-    throw err;
+export async function fetchItemVersionInfo(
+  userId: number,
+  projectId: number,
+  itemId: number,
+  versionId: number,
+) {
+  const rows = await sql`
+    SELECT iv.id, iv.version_number, iv.details
+    FROM item_versions iv
+    JOIN items i ON iv.item_id = i.id
+    JOIN projects p ON i.project_id = p.id
+    WHERE iv.id = ${versionId}
+      AND i.id = ${itemId}
+      AND p.id = ${projectId}
+      AND p.owner_user_id = ${userId}
+    LIMIT 1;
+  `;
+
+  if (!rows[0]) {
+    throw new Error("Version not found or access denied");
   }
+
+  return rows[0];
 }
 
-export async function editItemVersion(params: {
-  versionId: string;
-  version_number: string;
-  details: string | null;
-}) {
-  try {
-    const rows = await sql`
-      UPDATE item_versions
+export async function editItemVersion(
+  userId: number,
+  projectId: number,
+  itemId: number,
+  versionId: number,
+  patch: {version_number: string; details: string | null;}
+) {
+    try {
+    const versionNumber = patch.version_number.trim();
+    const details = patch.details?.trim() ? patch.details.trim() : null;
+
+    if (!versionNumber) {
+      throw new Error("version_number is required");
+    }
+
+    const rows = await sql/* sql */ `
+      UPDATE item_versions AS iv
       SET
-        version_number = ${params.version_number},
-        details = ${params.details},
-        updated_at = CURRENT_TIMESTAMP
-      WHERE id = ${params.versionId}
-      RETURNING id, item_id, version_number, details, updated_at;
+        version_number = ${versionNumber},
+        details = ${details}
+      FROM items AS i, projects AS p
+      WHERE iv.id = ${versionId}
+        AND iv.item_id = ${itemId}
+        AND iv.item_id = i.id
+        AND i.project_id = ${projectId}
+        AND i.project_id = p.id
+        AND p.owner_user_id = ${userId}
+      RETURNING iv.id, iv.version_number, iv.details, iv.updated_at;
     `;
-    return rows[0] ?? null;
-  } catch (err) {
-    console.error("updateItemVersion error:", err);
-    throw err;
+
+    if (!rows[0]) {
+      throw new Error("Update failed: version not found or you don’t have access.");
+    }
+    return { success: true, version: rows[0] };
+  } catch (error) {
+    console.error("editItemVersion failed:", error);
+    throw error;
   }
+
 }
 
 export async function updateItemVersion(
@@ -201,13 +230,6 @@ try {
     }
 
     const newVersionId = newVerRows[0].id;
-
-    // console.log(
-    //     "NEW VERSION ID:",
-    //     newVersionId,
-    //     typeof newVersionId
-    // );
-
 
     // 3) Point item to that new version as the current version
     await sql`
@@ -413,8 +435,7 @@ export async function editProject(
   userId: number,
   patch: { name: string; description: string | null }
 ) {
-  // This pattern prevents editing a project you don't own/have access to.
-  const rows = await sql/* sql */ `
+  const rows = await sql`
     UPDATE projects p
     SET
       name = ${patch.name},
@@ -428,4 +449,136 @@ export async function editProject(
   if (!rows[0]) {
     throw new Error("Update failed (project not found or no access)");
   }
+}
+
+export async function editItem(
+  userId: number,
+  projectId: number,
+  itemId: number,
+  patch: {name: string; item_type: string | null}
+) {
+  const rows = await sql/* sql */ `
+    UPDATE items i
+    SET
+      name = ${patch.name},
+      item_type = ${patch.item_type}
+    FROM projects p
+    WHERE
+      i.project_id = p.id
+      AND p.owner_user_id = ${userId}
+      AND p.id = ${projectId}
+      AND i.id = ${itemId}
+    RETURNING i.id;
+  `;
+
+  if (!rows[0]) {
+    throw new Error("Update failed (item not found or no access)");
+  }
+}
+
+export async function fetchItem(
+  userId: number,
+  projectId: number,
+  itemId: number
+): Promise<Item>  {
+  try {
+    const rows = await sql/* sql */ `
+      SELECT i.id, i.project_id, i.name, i.item_type, i.created_at, i.current_item_version_id
+      FROM items i
+      JOIN projects p ON p.id = i.project_id
+      WHERE
+        p.owner_user_id = ${userId}
+        AND p.id = ${projectId}
+        AND i.id = ${itemId}
+      LIMIT 1;
+    `;
+
+    if (rows.length === 0) {
+      throw new Error("Item not found or access denied");
+    }
+    return rows[0] as Item;
+  } catch(error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch item.");
+  }
+}
+
+export async function deleteItemVersion(
+    itemVersionId: number, 
+    itemId: number,
+    projectId: number,
+    userId: number
+) {
+  const rows = await sql/* sql */ `
+    WITH ctx AS (
+      -- Ensure ownership + lock the item row to avoid races
+      SELECT i.id AS item_id,
+             i.current_item_version_id AS current_vid
+      FROM items i
+      JOIN projects p ON p.id = i.project_id
+      WHERE i.id = ${itemId}
+        AND i.project_id = ${projectId}
+        AND p.owner_user_id = ${userId}
+      FOR UPDATE
+    ),
+    target AS (
+      -- Ensure the version belongs to this item
+      SELECT iv.id, iv.updated_at
+      FROM item_versions iv
+      JOIN ctx ON ctx.item_id = iv.item_id
+      WHERE iv.id = ${itemVersionId}
+    ),
+    prev_version AS (
+      -- "Previous" = immediately older than the target
+      SELECT iv.id
+      FROM item_versions iv
+      JOIN target t ON iv.item_id = ${itemId}
+      WHERE (iv.updated_at, iv.id) < (t.updated_at, t.id)
+      ORDER BY iv.updated_at DESC, iv.id DESC
+      LIMIT 1
+    ),
+    allowed AS (
+      SELECT
+        (SELECT current_vid FROM ctx) = (SELECT id FROM target) AS deleting_current,
+        (SELECT id FROM prev_version) AS prev_id
+    ),
+    upd AS (
+      UPDATE items i
+      SET current_item_version_id = (SELECT prev_id FROM allowed)
+      WHERE i.id = (SELECT item_id FROM ctx)
+        AND (SELECT deleting_current FROM allowed) = true
+        AND (SELECT prev_id FROM allowed) IS NOT NULL
+      RETURNING i.current_item_version_id
+    ),
+    del AS (
+      DELETE FROM item_versions iv
+      WHERE iv.id = (SELECT id FROM target)
+        AND (
+          -- If deleting current, only allow when a previous exists
+          (SELECT deleting_current FROM allowed) = false
+          OR (SELECT prev_id FROM allowed) IS NOT NULL
+        )
+      RETURNING iv.id
+    )
+    SELECT
+      (SELECT id FROM del) AS deleted_version_id,
+      -- If we updated current, this returns the new current; otherwise keep the old current
+      COALESCE(
+        (SELECT current_item_version_id FROM upd),
+        (SELECT current_vid FROM ctx)
+      ) AS new_current_version_id;
+  `;
+
+  // No row returned => either not found, no access, OR you tried to delete current with no previous
+  if (!rows[0] || !rows[0].deleted_version_id) {
+    throw new Error(
+      "Delete blocked: version not found / no access, or you tried to delete the only (current) version."
+    );
+  }
+
+  return {
+    success: true,
+    deletedVersionId: rows[0].deleted_version_id,
+    newCurrentVersionId: rows[0].new_current_version_id,
+  };
 }

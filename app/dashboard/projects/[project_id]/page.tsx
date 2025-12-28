@@ -167,7 +167,7 @@ export default async function ProjectPage({
                 <th className="px-4 py-3">
                   {asOfIso ? "Historic version details" : "Current version details"}
                 </th>
-                <th className="px-4 py-3">{asOfIso ? "Historic updated (UTC)" : "Updated (UTC)"}</th>
+                <th className="px-4 py-3">{asOfIso ? "Historic version updated at (UTC)" : "Version updated at (UTC)"}</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -204,6 +204,13 @@ export default async function ProjectPage({
                         className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
                       >
                         Open
+                      </Link>
+                      
+                      <Link
+                        href={`/dashboard/projects/${projectId}/items/${it.id}/edit`}
+                        className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
+                      >
+                        Edit
                       </Link>
 
                       <form action={deleteItemAction}>

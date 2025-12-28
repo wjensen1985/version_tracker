@@ -1,24 +1,39 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { editItemVersion } from "@/app/lib/data";
+import { getCurrentUserId } from "./auth";
+import { editItemVersion } from "./data";
+import { revalidatePath } from "next/cache";
 
 export async function updateItemVersionAction(
-  projectId: string,
-  itemId: string,
-  versionId: string,
   formData: FormData
 ) {
-  const version_number = String(formData.get("version_number") ?? "").trim();
-  const detailsRaw = String(formData.get("details") ?? "").trim();
-  const details = detailsRaw.length ? detailsRaw : null;
+    const userId = await getCurrentUserId();
 
-  if (!version_number) {
-    throw new Error("version_number is required");
-  }
+    const projectId = Number.parseInt(String(formData.get("projectId") ?? ""), 10);
+    const itemId = Number.parseInt(String(formData.get("itemId") ?? ""), 10);
+    const versionId = Number.parseInt(String(formData.get("versionId") ?? ""), 10);
 
-  await editItemVersion({ versionId, version_number, details });
+    if (!Number.isInteger(projectId) || !Number.isInteger(itemId) || !Number.isInteger(versionId)) {
+      throw new Error("Invalid ids");
+    }
 
-  // Redirect back to wherever you show the version history (adjust if different)
-  redirect(`/dashboard/projects/${projectId}/items/${itemId}`);
+    const versionNumber = String(formData.get("version_number") ?? "").trim();
+    const detailsRaw = String(formData.get("details") ?? "");
+    const details = detailsRaw.trim() ? detailsRaw.trim() : null;
+
+    if (!versionNumber) {
+      throw new Error("Version number is required");
+    }
+
+    await editItemVersion(
+      userId,
+      projectId,
+      itemId,
+      versionId,
+      {version_number: versionNumber, details: details},
+    );
+
+    revalidatePath(`/dashboard/projects/${projectId}/items/${itemId}`);
+    redirect(`/dashboard/projects/${projectId}/items/${itemId}`);
 }

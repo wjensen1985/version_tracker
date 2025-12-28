@@ -1,60 +1,80 @@
-import Link from "next/link";
-import { fetchItemVersionById } from "@/app/lib/data";
+import { fetchItemVersionInfo } from "@/app/lib/data";
 import { updateItemVersionAction } from "@/app/lib/actions";
+import { getCurrentUserId } from "@/app/lib/auth";
 
 export default async function EditVersionPage({
   params,
 }: {
-  params: { project_id: string; item_id: string; version_id: string };
+    params: Promise<{
+    project_id: string;
+    item_id: string;
+    version_id: string;
+  }>;
 }) {
-  const v = await fetchItemVersionById(params.version_id);
 
-  if (!v) return <div className="p-6">Version not found</div>;
+  const { project_id, item_id, version_id } = await params;
+
+  const projectId = Number(project_id);
+  const itemId = Number(item_id);
+  const versionId = Number(version_id);
+  
+  if (
+    !Number.isInteger(projectId) ||
+    !Number.isInteger(itemId) ||
+    !Number.isInteger(versionId)
+  ) {
+    throw new Error("Invalid route params");
+  }
+
+  const userId = await getCurrentUserId();
+
+  const version = await fetchItemVersionInfo(userId, projectId, itemId, versionId);
 
   return (
-    <main className="p-6 max-w-xl">
-      <h1 className="text-xl font-semibold mb-4">Edit Version</h1>
+    <main className="p-6">
+      <div className="max-w-xl rounded-xl border bg-white p-6">
+        <h1 className="text-lg font-semibold">Edit version</h1>
 
-      <form
-        action={updateItemVersionAction.bind(
-          null,
-          params.project_id,
-          params.item_id,
-          params.version_id
-        )}
-        className="space-y-4"
-      >
-        <div>
-          <label className="block text-sm mb-1">Version number</label>
-          <input
-            name="version_number"
-            defaultValue={v.version_number}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
+        <form action={updateItemVersionAction} className="mt-4 space-y-4">
+          <input type="hidden" name="projectId" value={projectId} />
+          <input type="hidden" name="versionId" value={versionId} />
+          <input type="hidden" name="itemId" value={itemId} />
+          <div>
+            <label className="block text-sm font-medium">Version number</label>
+            <input
+              name="version_number"
+              defaultValue={version.version_number}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              required
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm mb-1">Details</label>
-          <textarea
-            name="details"
-            defaultValue={v.details ?? ""}
-            className="w-full border rounded px-3 py-2"
-            rows={5}
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium">Details</label>
+            <textarea
+              name="details"
+              defaultValue={version.details ?? ""}
+              rows={4}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            />
+          </div>
 
-        <div className="flex justify-end gap-2">
-          <Link
-            className="px-3 py-2 border rounded"
-            href={`/dashboard/projects/${params.project_id}/items/${params.item_id}`}
-          >
-            Cancel
-          </Link>
-          <button className="px-3 py-2 border rounded" type="submit">
-            Save
-          </button>
-        </div>
-      </form>
+          <div className="flex justify-end gap-2">
+            <a
+              href={`/dashboard/projects/${projectId}/items/${itemId}`}
+              className="rounded-lg border px-3 py-2 text-sm"
+            >
+              Cancel
+            </a>
+            <button
+              type="submit"
+              className="rounded-lg bg-black px-3 py-2 text-sm text-white"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
     </main>
   );
 }

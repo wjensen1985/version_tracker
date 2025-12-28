@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { getCurrentUserId } from "@/app/lib/auth";
 import { fetchItemWithVersions } from "@/app/lib/data";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import ConfirmDeleteButton from "@/app/components/ConfirmDeleteButton";
+import { deleteItemVersion } from "@/app/lib/data";
 
 function fmt(iso: string) {
   const d = new Date(iso);
@@ -37,6 +41,28 @@ export default async function ItemPage({
 
   const { item, versions } = result;
 
+  async function deleteItemVersionAction(formData: FormData) {
+    "use server";
+
+    const userId = await getCurrentUserId();
+
+    const itemVersionId = Number.parseInt(String(formData.get("itemVersionId") ?? ""), 10);
+    const itemIdFromForm = Number.parseInt(String(formData.get("itemId") ?? ""), 10);
+    const projectIdFromForm = Number.parseInt(String(formData.get("projectId") ?? ""), 10);
+
+    if (
+      !Number.isInteger(itemVersionId) ||
+      !Number.isInteger(itemIdFromForm) ||
+      !Number.isInteger(projectIdFromForm)
+    ) {
+      throw new Error("Invalid ids");
+    }
+
+    await deleteItemVersion(itemVersionId, itemId, projectId, userId);
+    revalidatePath(`/dashboard/projects/${projectId}/items/${itemId}`);
+    redirect(`/dashboard/projects/${projectId}/items/${itemId}`);
+  }
+
   return (
     <div className="p-6">
       <div className="mb-4 flex items-start justify-between">
@@ -62,7 +88,6 @@ export default async function ItemPage({
             <p className="text-sm text-gray-600">{versions.length} versions</p>
           </div>
 
-          {/* later: link to "new version" flow */}
           <Link
             href={`/dashboard/projects/${projectId}/items/${itemId}/versions/new`}
             className="rounded-lg bg-black px-3 py-2 text-sm font-medium text-white hover:opacity-90"
@@ -79,13 +104,14 @@ export default async function ItemPage({
                 <th className="px-4 py-3">Updated</th>
                 <th className="px-4 py-3">Details</th>
                 <th className="px-4 py-3">Current</th>
-                <th className="px-4 py-3">Actions</th>
+                <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
 
             <tbody className="divide-y">
               {versions.map((v) => {
                 const isCurrent = item.current_item_version_id === v.id;
+                const canDelete = !(isCurrent && versions.length === 1);
                 // console.log(
                 //   "current_item_version_id:", item.current_item_version_id, typeof item.current_item_version_id,
                 //   "v.id:", v.id, typeof v.id
@@ -109,8 +135,32 @@ export default async function ItemPage({
                         "—"
                       )}
                     </td>
-                    <td>
+                    
+                    
+
+                    <td className="px-4 py-3 text-gray-900">
+                      <div className="flex justify-end gap-2">
+
+                        <Link
+                          href={`/dashboard/projects/${projectId}/items/${itemId}/versions/${v.id}/edit`}
+                          className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
+                        >
+                          Edit
+                        </Link>
+
+                        {canDelete ? (
+                          <form action={deleteItemVersionAction}>
+                            <input type="hidden" name="itemVersionId" value={v.id} />
+                            <input type="hidden" name="itemId" value={itemId} />
+                            <input type="hidden" name="projectId" value={projectId} />
+                            <ConfirmDeleteButton />
+                          </form>
+                        ) : (
+                          <span className="text-xs text-gray-500">Can’t delete the only version</span>
+                        )}
+                      </div>
                     </td>
+
                   </tr>
                 );
               })}

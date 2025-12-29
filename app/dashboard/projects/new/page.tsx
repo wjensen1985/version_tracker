@@ -1,31 +1,7 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
-
-import { getCurrentUserId } from "@/app/lib/auth";
-import { createProject } from "@/app/lib/data";
+import { createProjectAction } from "@/app/lib/actions";
 
 export default async function NewProjectPage() {
-  const userId = await getCurrentUserId();
-
-  async function createProjectAction(formData: FormData) {
-    "use server";
-
-    const userId = await getCurrentUserId();
-
-    const name = String(formData.get("name") ?? "").trim();
-    const descriptionRaw = String(formData.get("description") ?? "");
-    const description = descriptionRaw.trim() ? descriptionRaw.trim() : null;
-
-    if (!name) {
-      throw new Error("Project name is required");
-    }
-
-    const project = await createProject(userId, name, description);
-
-    revalidatePath("/dashboard");
-    redirect(`/dashboard/projects/${project.id}`);
-  }
 
   return (
     <div className="p-6 max-w-xl">

@@ -1,10 +1,8 @@
 import Link from "next/link";
 import { getCurrentUserId } from "@/app/lib/auth";
 import { fetchItemWithVersions } from "@/app/lib/data";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import ConfirmDeleteButton from "@/app/components/ConfirmDeleteButton";
-import { deleteItemVersion } from "@/app/lib/data";
+import { deleteItemVersionAction } from "@/app/lib/actions";
 
 function fmt(iso: string) {
   const d = new Date(iso);
@@ -40,28 +38,6 @@ export default async function ItemPage({
   }
 
   const { item, versions } = result;
-
-  async function deleteItemVersionAction(formData: FormData) {
-    "use server";
-
-    const userId = await getCurrentUserId();
-
-    const itemVersionId = Number.parseInt(String(formData.get("itemVersionId") ?? ""), 10);
-    const itemIdFromForm = Number.parseInt(String(formData.get("itemId") ?? ""), 10);
-    const projectIdFromForm = Number.parseInt(String(formData.get("projectId") ?? ""), 10);
-
-    if (
-      !Number.isInteger(itemVersionId) ||
-      !Number.isInteger(itemIdFromForm) ||
-      !Number.isInteger(projectIdFromForm)
-    ) {
-      throw new Error("Invalid ids");
-    }
-
-    await deleteItemVersion(itemVersionId, itemId, projectId, userId);
-    revalidatePath(`/dashboard/projects/${projectId}/items/${itemId}`);
-    redirect(`/dashboard/projects/${projectId}/items/${itemId}`);
-  }
 
   return (
     <div className="p-6">

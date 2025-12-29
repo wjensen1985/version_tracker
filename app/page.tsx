@@ -1,4 +1,4 @@
-import { CardSkeleton } from "./ui/skeletons";
+import { CardSkeleton } from "./components/skeletons";
 
 
 // intro home page for application -> link to login & show overview pic of what this app does

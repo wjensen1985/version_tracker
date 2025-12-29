@@ -1,7 +1,6 @@
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { getCurrentUserId } from "@/app/lib/auth";
-import { editProject, fetchProjectById } from "@/app/lib/data";
+import { fetchProjectById } from "@/app/lib/data";
+import { updateProjectAction } from "@/app/lib/actions";
 
 export default async function EditProjectPage({
   params,
@@ -19,28 +18,6 @@ export default async function EditProjectPage({
 
   // Prefill form (and also doubles as an authorization check)
   const project = await fetchProjectById(projectId, userId);
-
-  async function updateProjectAction(formData: FormData) {
-    "use server";
-
-    const userId = await getCurrentUserId();
-
-    const projectIdRaw = String(formData.get("projectId") ?? "");
-    const projectId = Number.parseInt(projectIdRaw, 10);
-    if (!Number.isInteger(projectId)) throw new Error("Invalid project id");
-
-    const name = String(formData.get("name") ?? "").trim();
-    const descriptionRaw = String(formData.get("description") ?? "");
-    const description = descriptionRaw.trim() ? descriptionRaw.trim() : null;
-
-    if (!name) throw new Error("Project name is required");
-
-    await editProject(projectId, userId, { name, description });
-
-    // Refresh any pages that show this data, then go back to dashboard
-    revalidatePath("/dashboard");
-    redirect("/dashboard");
-  }
 
   return (
     <main className="p-6">

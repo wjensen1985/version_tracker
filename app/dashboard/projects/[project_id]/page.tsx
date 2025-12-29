@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { deleteItem, fetchProjectById, fetchProjectDashboard, fetchProjectDashboardAsOf } from "@/app/lib/data";
+import { fetchProjectById, fetchProjectDashboard, fetchProjectDashboardAsOf } from "@/app/lib/data";
 import type { ProjectItemRow, HistoricProjectItemRow } from "@/app/lib/definitions";
 import { getCurrentUserId } from "@/app/lib/auth";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import ConfirmDeleteButton from "@/app/components/ConfirmDeleteButton";
 import HistoricTimestampPicker from "@/app/components/HistoricTimestampPicker";
+import { deleteItemAction } from "@/app/lib/actions";
 
 function fmt(iso: string | null) {
   if (!iso) return "—";
@@ -81,22 +80,6 @@ export default async function ProjectPage({
   const items = asOfIso
     ? await fetchProjectDashboardAsOf(projectId, userId, asOfIso)
     : await fetchProjectDashboard(projectId, userId);
-  // console.log(items);
-
-  async function deleteItemAction(formData: FormData) {
-    "use server";
-
-    const userId = await getCurrentUserId();
-
-    const itemId = Number.parseInt(String(formData.get("itemId") ?? ""), 10);
-    if (!Number.isInteger(itemId)) {
-      throw new Error("Invalid item id");
-    }
-
-    await deleteItem(projectId, itemId, userId);
-    revalidatePath(`/dashboard/projects/${projectId}`);
-    redirect(`/dashboard/projects/${projectId}`);
-  }
 
   return (
     <div className="p-6">
@@ -215,6 +198,7 @@ export default async function ProjectPage({
 
                       <form action={deleteItemAction}>
                         <input type="hidden" name="itemId" value={it.id} />
+                        <input type="hidden" name="projectId" value={projectId} />
                         <ConfirmDeleteButton />
                       </form>
 

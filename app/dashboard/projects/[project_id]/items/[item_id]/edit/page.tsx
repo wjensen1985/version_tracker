@@ -1,7 +1,6 @@
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { getCurrentUserId } from "@/app/lib/auth";
-import { fetchItem, editItem } from "@/app/lib/data";
+import { fetchItem } from "@/app/lib/data";
+import { updateItemAction } from "@/app/lib/actions";
 
 export default async function EditItemPage({
   params,
@@ -21,30 +20,6 @@ export default async function EditItemPage({
 
   // Prefill + authorization
   const item = await fetchItem(userId, projectId, itemId);
-
-  async function updateItemAction(formData: FormData) {
-    "use server";
-
-    const userId = await getCurrentUserId();
-
-    const projectId = Number.parseInt(String(formData.get("projectId") ?? ""), 10);
-    const itemId = Number.parseInt(String(formData.get("itemId") ?? ""), 10);
-
-    const name = String(formData.get("name") ?? "").trim();
-    const itRaw = String(formData.get("description") ?? "");
-    const item_type = itRaw.trim() ? itRaw.trim() : null;
-
-    if (!Number.isInteger(projectId) || !Number.isInteger(itemId)) {
-      throw new Error("Invalid ids");
-    }
-    if (!name) throw new Error("Item name is required");
-
-    await editItem(userId, projectId, itemId, {name, item_type});
-
-    // Refresh the items list page and return there
-    revalidatePath(`/dashboard/projects/${projectId}`);
-    redirect(`/dashboard/projects/${projectId}`);
-  }
 
   return (
     <main className="p-6">

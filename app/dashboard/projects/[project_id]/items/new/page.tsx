@@ -1,7 +1,6 @@
 import { getCurrentUserId } from "@/app/lib/auth";
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
-import { createItem, fetchProjectById } from "@/app/lib/data";
+import { fetchProjectById } from "@/app/lib/data";
+import { createItemAction } from "@/app/lib/actions";
 
 
 export default async function NewItemPage({
@@ -17,34 +16,6 @@ export default async function NewItemPage({
   const project = await fetchProjectById(projectId, userId);
   if (!project) return <div className="p-6">Project not found (or no access).</div>;
 
-  async function createItemAction(formData: FormData) {
-    "use server";
-
-    const userId = await getCurrentUserId();
-    const project = await fetchProjectById(projectId, userId);
-    if (!project) throw new Error("Not authorized.");
-
-    const name = String(formData.get("name") ?? "").trim();
-    const initialVersion = String(formData.get("initialVersion") ?? "").trim();
-    const details = String(formData.get("details") ?? "").trim();
-    const detailsOrNull = details.length ? details : null;
-    const itype = String(formData.get("item_type") ?? "").trim();
-    const itypeOrNull = itype.length ? itype : null;
-
-    if (!name) throw new Error("Name is required.");
-    if (!initialVersion) throw new Error("Initial version is required.");
-
-    const { itemId } = await createItem(projectId, name, initialVersion, detailsOrNull, itypeOrNull);
-
-    revalidatePath(`/dashboard/projects/${projectId}`);
-
-    // Option A: back to project overview
-    redirect(`/dashboard/projects/${projectId}`);
-
-    // Option B (later): go to item detail
-    // redirect(`/dashboard/projects/${projectId}/items/${itemId}`);
-  }
-
   return (
     <div className="p-6 max-w-xl">
       <h1 className="text-2xl font-semibold">New item</h1>
@@ -53,6 +24,7 @@ export default async function NewItemPage({
       </p>
 
       <form action={createItemAction} className="mt-6 space-y-4 rounded-xl border bg-white p-4">
+        <input type="hidden" name="projectId" value={projectId} />
         <div>
           <label className="block text-sm font-medium">Item name</label>
           <input

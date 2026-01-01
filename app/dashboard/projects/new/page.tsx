@@ -7,10 +7,10 @@ export default async function NewProjectPage() {
     <div className="p-6 max-w-xl">
       <div className="mb-4">
         <h1 className="text-2xl font-semibold">New project</h1>
-        <p className="mt-1 text-sm text-gray-600">Create a project to start tracking items and versions.</p>
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Create a project to start tracking items and versions.</p>
       </div>
 
-      <form action={createProjectAction} className="rounded-xl border bg-white p-4 space-y-4">
+      <form action={createProjectAction} className="rounded-xl border border-gray-200 bg-white p-4 space-y-4 dark:border-gray-800 dark:bg-gray-900">
         <div>
           <label className="block text-sm font-medium">Project name</label>
           <input
@@ -34,13 +34,13 @@ export default async function NewProjectPage() {
         <div className="flex items-center justify-end gap-2">
           <Link
             href="/dashboard"
-            className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-gray-50"
+            className="rounded-lg border border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
           >
             Cancel
           </Link>
           <button
             type="submit"
-            className="rounded-lg bg-black px-3 py-2 text-sm font-medium text-white hover:opacity-90"
+            className="rounded-lg border border-gray-900 bg-black px-3 py-2 text-sm font-medium text-white hover:bg-gray-900 hover:text-white dark:border-gray-200 dark:bg-white dark:text-black dark:hover:bg-gray-100 dark:hover:text-gray-900"
           >
             Create project
           </button>

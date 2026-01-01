@@ -14,7 +14,7 @@ export default function ConfirmDeleteButton({ label = "Delete" }: Props) {
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-gray-50"
+        className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
       >
         {label}
       </button>
@@ -32,7 +32,7 @@ export default function ConfirmDeleteButton({ label = "Delete" }: Props) {
       <button
         type="button"
         onClick={() => setConfirming(false)}
-        className="rounded-lg border px-2 py-1 text-xs hover:bg-gray-50"
+        className="rounded-lg border border-gray-700 px-2 py-1 text-xs hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
       >
         Cancel
       </button>

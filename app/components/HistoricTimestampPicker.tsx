@@ -48,13 +48,13 @@ export default function HistoricTimestampPicker({
 
   return (
     <div className="flex flex-col">
-      <label className="text-xs font-semibold uppercase tracking-wide text-gray-600">
+      <label className="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
         Historic view (UTC)
       </label>
 
       <div className="relative mt-1">
         <button
-          className="w-full rounded-lg border px-3 py-2 text-left text-sm hover:bg-white"
+          className="w-full rounded-lg border border-gray-700 px-3 py-2 text-left text-sm hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
           type="button"
           onClick={open}
         >
@@ -74,7 +74,7 @@ export default function HistoricTimestampPicker({
             if (e.target === e.currentTarget) close();
           }}
         >
-          <div className="w-full max-w-md rounded-xl border bg-white p-4 shadow-lg">
+          <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-900">
             <div className="flex flex-col gap-3">
               <div className="flex items-start justify-between">
                 <div className="text-sm font-semibold">
@@ -83,7 +83,7 @@ export default function HistoricTimestampPicker({
 
                 <div className="flex gap-2">
                   <button
-                    className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-gray-50"
+                    className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
                     type="button"
                     onClick={close}
                   >
@@ -91,7 +91,7 @@ export default function HistoricTimestampPicker({
                   </button>
 
                   <button
-                    className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
+                    className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
                     type="button"
                     onClick={() => {
                       // Update state so the button label stays in sync

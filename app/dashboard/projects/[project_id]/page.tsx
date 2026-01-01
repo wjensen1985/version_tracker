@@ -87,45 +87,45 @@ export default async function ProjectPage({
         <div>
           <h1 className="text-2xl font-semibold">{project.name}</h1>
           {project.description ? (
-            <p className="mt-1 text-sm text-gray-600">{project.description}</p>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{project.description}</p>
           ) : null}
         </div>
 
         <Link
           href="/dashboard"
-          className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-gray-50"
+          className="rounded-lg border border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
         >
           Back to dashboard
         </Link>
       </div>
 
-      <div className="rounded-xl border bg-white">
+      <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <div className="flex items-center justify-between p-4">
           <div>
             <h2 className="text-lg font-semibold">Items</h2>
-            <p className="text-sm text-gray-600">{items.length} total</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{items.length} total</p>
           </div>
 
           <Link
             href={`/dashboard/projects/${projectId}/items/new`}
-            className="rounded-lg bg-black px-3 py-2 text-sm font-medium text-white hover:opacity-90"
+            className="rounded-lg border border-gray-900 bg-black px-3 py-2 text-sm font-medium text-white hover:bg-gray-900 hover:text-white dark:border-gray-200 dark:bg-white dark:text-black dark:hover:bg-gray-100 dark:hover:text-gray-900"
           >
             New item
           </Link>
         </div>
 
-        <div className="border-t bg-gray-50 p-4">
+        <div className="border-t border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900">
           <form className="flex flex-wrap items-end gap-3" method="GET">
             <HistoricTimestampPicker initialValue={asOfInputValue} />
             <button
-              className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-white"
+              className="rounded-lg border border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
               type="submit"
             >
               View Selected
             </button>
             {asOf ? (
               <Link
-                className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-white"
+                className="rounded-lg border border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
                 href={`/dashboard/projects/${projectId}`}
               >
                 Clear
@@ -134,15 +134,15 @@ export default async function ProjectPage({
           </form>
 
           {asOfIso ? (
-            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-400/40 dark:bg-amber-900/20 dark:text-amber-200">
               Historic view as of <span className="font-semibold">{asOfIso}</span> UTC
             </div>
           ) : null}
         </div>
 
-        <div className="overflow-x-auto border-t">
+        <div className="overflow-x-auto border-t border-gray-200 dark:border-gray-800">
           <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+            <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-600 dark:bg-gray-900 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-3">Item</th>
                 <th className="px-4 py-3">Type</th>
@@ -157,7 +157,7 @@ export default async function ProjectPage({
 
             <tbody className="divide-y">
               {items.map((it: ProjectItemRow | HistoricProjectItemRow) => (
-                <tr key={it.id} className="hover:bg-gray-50">
+                <tr key={it.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
                   <td className="px-4 py-3 font-medium">
                     <Link
                       className="hover:underline"
@@ -166,16 +166,16 @@ export default async function ProjectPage({
                       {it.name}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-700">{it.item_type ?? "—"}</td>
-                  <td className="px-4 py-3 text-gray-700">
+                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">{it.item_type ?? "—"}</td>
+                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                     {"historic_version" in it ? it.historic_version ?? "—" : it.current_version ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-gray-700">
+                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                     {"historic_version_details" in it
                       ? it.historic_version_details ?? "—"
                       : it.current_version_details ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-gray-700">
+                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                     {"historic_version_updated_at" in it
                       ? fmt(it.historic_version_updated_at)
                       : fmt(it.current_version_updated_at)}
@@ -184,14 +184,14 @@ export default async function ProjectPage({
                     <div className="flex justify-end gap-2">
                       <Link
                         href={`/dashboard/projects/${projectId}/items/${it.id}`}
-                        className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
+                        className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
                       >
                         Open
                       </Link>
                       
                       <Link
                         href={`/dashboard/projects/${projectId}/items/${it.id}/edit`}
-                        className="rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-white"
+                        className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
                       >
                         Edit
                       </Link>
@@ -209,7 +209,7 @@ export default async function ProjectPage({
 
               {items.length === 0 ? (
                 <tr>
-                  <td className="px-4 py-6 text-sm text-gray-600" colSpan={6}>
+                  <td className="px-4 py-6 text-sm text-gray-600 dark:text-gray-400" colSpan={6}>
                     No items yet.
                   </td>
                 </tr>

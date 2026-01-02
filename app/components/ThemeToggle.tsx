@@ -20,7 +20,7 @@ export default function ThemeToggle() {
     <button
       type="button"
       onClick={() => setTheme(nextTheme)}
-      className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:text-gray-200 dark:hover:bg-gray-100 dark:hover:text-gray-900"
+      className="rounded-lg border-2 border-gray-700 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:text-gray-200 dark:hover:bg-gray-300 dark:hover:text-gray-900"
       aria-label={`Switch to ${nextTheme} mode`}
     >
       {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}

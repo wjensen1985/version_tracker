@@ -93,7 +93,7 @@ export default async function ProjectPage({
 
         <Link
           href="/dashboard"
-          className="rounded-lg border border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
+          className="rounded-lg border-2 border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:hover:bg-gray-300 dark:hover:text-gray-900"
         >
           Back to dashboard
         </Link>
@@ -108,7 +108,7 @@ export default async function ProjectPage({
 
           <Link
             href={`/dashboard/projects/${projectId}/items/new`}
-            className="rounded-lg border border-gray-900 bg-black px-3 py-2 text-sm font-medium text-white hover:bg-gray-900 hover:text-white dark:border-gray-200 dark:bg-white dark:text-black dark:hover:bg-gray-100 dark:hover:text-gray-900"
+            className="rounded-lg border-2 border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:hover:bg-gray-300 dark:hover:text-gray-900"
           >
             New item
           </Link>
@@ -118,14 +118,14 @@ export default async function ProjectPage({
           <form className="flex flex-wrap items-end gap-3" method="GET">
             <HistoricTimestampPicker initialValue={asOfInputValue} />
             <button
-              className="rounded-lg border border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
+              className="rounded-lg border-2 border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:hover:bg-gray-300 dark:hover:text-gray-900"
               type="submit"
             >
               View Selected
             </button>
             {asOf ? (
               <Link
-                className="rounded-lg border border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
+                className="rounded-lg border-2 border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:hover:bg-gray-300 dark:hover:text-gray-900"
                 href={`/dashboard/projects/${projectId}`}
               >
                 Clear
@@ -184,14 +184,14 @@ export default async function ProjectPage({
                     <div className="flex justify-end gap-2">
                       <Link
                         href={`/dashboard/projects/${projectId}/items/${it.id}`}
-                        className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
+                        className="rounded-lg border-2 border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:hover:bg-gray-300 dark:hover:text-gray-900"
                       >
                         Open
                       </Link>
                       
                       <Link
                         href={`/dashboard/projects/${projectId}/items/${it.id}/edit`}
-                        className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
+                        className="rounded-lg border-2 border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:hover:bg-gray-300 dark:hover:text-gray-900"
                       >
                         Edit
                       </Link>

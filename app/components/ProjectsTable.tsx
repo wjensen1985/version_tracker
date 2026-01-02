@@ -30,7 +30,7 @@ export default function ProjectsTable({
         </p>
         <Link
           href="/dashboard/projects/new"
-          className="mt-4 inline-flex items-center rounded-lg border border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
+          className="mt-4 inline-flex items-center rounded-lg border-2 border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:hover:bg-gray-300 dark:hover:text-gray-900"
         >
           New project
         </Link>
@@ -48,7 +48,7 @@ export default function ProjectsTable({
 
         <Link
           href="/dashboard/projects/new"
-          className="inline-flex items-center rounded-lg border border-gray-900 bg-black px-3 py-2 text-sm font-medium text-white hover:bg-gray-900 hover:text-white dark:border-gray-200 dark:bg-white dark:text-black dark:hover:bg-gray-100 dark:hover:text-gray-900"
+          className="inline-flex items-center rounded-lg border-2 border-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:hover:bg-gray-300 dark:hover:text-gray-900"
         >
           New project
         </Link>
@@ -84,14 +84,14 @@ export default function ProjectsTable({
                   <div className="flex justify-end gap-2">
                     <Link
                       href={`/dashboard/projects/${p.id}`}
-                      className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
+                      className="rounded-lg border-2 border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:hover:bg-gray-300 dark:hover:text-gray-900"
                     >
                       Open
                     </Link>
 
                     <Link
                       href={`/dashboard/projects/${p.id}/edit`}
-                      className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-900 hover:text-white dark:border-gray-300 dark:hover:bg-gray-100 dark:hover:text-gray-900"
+                      className="rounded-lg border-2 border-gray-700 px-3 py-1.5 text-xs font-medium hover:bg-gray-700 hover:text-white dark:border-gray-300 dark:hover:bg-gray-300 dark:hover:text-gray-900"
                     >
                       Edit
                     </Link>

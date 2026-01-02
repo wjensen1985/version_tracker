@@ -8,6 +8,9 @@ export default neonAuthMiddleware({
 export const config = {
   matcher: [
     // Protected routes requiring authentication
-    "/*",
+    '/dashboard/:path*',
+
+    // exclude static resources:
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

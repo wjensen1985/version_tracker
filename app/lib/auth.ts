@@ -18,9 +18,30 @@
 //   providers: [GitHub],
 // })
 
+import { neonAuth } from "@neondatabase/auth/next/server";
+import { sql } from "./db";
+
 export async function getCurrentUserId(): Promise<number> {
   // e.g. from Clerk / NextAuth / custom cookie session
   // return session.user.id
-  return 2;
+  
+  const { session, user } = await neonAuth();
+  if ((!session) || (!user)) {
+    throw new Error('Not Authenticated');
+  }
+
+  const authUserId = user.id;
+  // console.log(authUserId)
+
+  // need to add if uuid doesn't exist, then create new entry in this table
+  const public_users_rows = await sql`
+    SELECT *
+    FROM users u
+    WHERE u.auth_user_uuid = ${authUserId}
+  `
+
+  // console.log(public_users_rows);
+
+  return public_users_rows[0]["id"] as number;
 //   throw new Error("Implement getCurrentUserId()");
 }

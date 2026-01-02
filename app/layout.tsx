@@ -31,7 +31,7 @@ export default function RootLayout({
           >
               <header className='flex justify-end items-center p-4 gap-4 h-16'>
                 <ThemeToggle />
-                <div className="rounded-full border-2 border-gray-700 dark:border-gray-300">
+                <div className="inline-flex rounded-full border-2 border-gray-700 dark:border-gray-300 overflow-hidden">
                   <UserButton size="icon" />
                 </div>
               </header>

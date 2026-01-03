@@ -1,4 +1,4 @@
-import { getCurrentUserId } from "@/app/lib/auth";
+import { getCurrentUserId } from "@/app/lib/auth/auth";
 import { fetchUserProjects } from "@/app/lib/data";
 import ProjectsTable from "../../components/ProjectsTable";
 import { deleteProjectAction } from "@/app/lib/actions";

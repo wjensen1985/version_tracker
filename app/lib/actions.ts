@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { getCurrentUserId } from "./auth";
+import { getCurrentUserId } from "./auth/auth";
 import { 
   editItemVersion, deleteProject, 
   createProject, deleteItem, 

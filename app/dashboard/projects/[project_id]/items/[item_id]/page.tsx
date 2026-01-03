@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCurrentUserId } from "@/app/lib/auth";
+import { getCurrentUserId } from "@/app/lib/auth/auth";
 import { fetchItemWithVersions } from "@/app/lib/data";
 import ConfirmDeleteButton from "@/app/components/ConfirmDeleteButton";
 import { deleteItemVersionAction } from "@/app/lib/actions";

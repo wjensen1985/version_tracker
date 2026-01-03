@@ -19,7 +19,7 @@
 // })
 
 import { neonAuth } from "@neondatabase/auth/next/server";
-import { sql } from "./db";
+import { sql } from "../db";
 
 export async function getCurrentUserId(): Promise<number> {
   // e.g. from Clerk / NextAuth / custom cookie session
@@ -35,10 +35,25 @@ export async function getCurrentUserId(): Promise<number> {
 
   // need to add if uuid doesn't exist, then create new entry in this table
   const public_users_rows = await sql`
+    WITH ins AS (
+      INSERT INTO users (auth_user_uuid, username)
+      VALUES (${authUserId}, ${user.name})
+      ON CONFLICT (auth_user_uuid) DO NOTHING
+      RETURNING *
+    )
     SELECT *
+    FROM ins
+    UNION ALL
+    SELECT u.*
     FROM users u
     WHERE u.auth_user_uuid = ${authUserId}
+    LIMIT 1;
   `
+  // const public_users_rows = await sql`
+  //   SELECT *
+  //   FROM users u
+  //   WHERE u.auth_user_uuid = ${authUserId}
+  // `
 
   // console.log(public_users_rows);
 

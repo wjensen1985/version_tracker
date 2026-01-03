@@ -1,4 +1,4 @@
-import { getCurrentUserId } from "@/app/lib/auth";
+import { getCurrentUserId } from "@/app/lib/auth/auth";
 import { fetchProjectById } from "@/app/lib/data";
 import { createItemAction } from "@/app/lib/actions";
 

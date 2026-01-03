@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { fetchProjectById, fetchProjectDashboard, fetchProjectDashboardAsOf } from "@/app/lib/data";
 import type { ProjectItemRow, HistoricProjectItemRow } from "@/app/lib/definitions";
-import { getCurrentUserId } from "@/app/lib/auth";
+import { getCurrentUserId } from "@/app/lib/auth/auth";
 import ConfirmDeleteButton from "@/app/components/ConfirmDeleteButton";
 import HistoricTimestampPicker from "@/app/components/HistoricTimestampPicker";
 import { deleteItemAction } from "@/app/lib/actions";

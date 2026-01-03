@@ -1,6 +1,6 @@
 import { fetchItemVersionInfo } from "@/app/lib/data";
 import { updateItemVersionAction } from "@/app/lib/actions";
-import { getCurrentUserId } from "@/app/lib/auth";
+import { getCurrentUserId } from "@/app/lib/auth/auth";
 
 export default async function EditVersionPage({
   params,

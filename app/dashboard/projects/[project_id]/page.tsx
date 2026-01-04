@@ -157,7 +157,7 @@ export default async function ProjectPage({
 
             <tbody className="divide-y">
               {items.map((it: ProjectItemRow | HistoricProjectItemRow) => (
-                <tr key={it.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                <tr key={it.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                   <td className="px-4 py-3 font-medium">
                     <Link
                       className="hover:underline"

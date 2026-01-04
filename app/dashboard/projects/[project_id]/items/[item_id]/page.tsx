@@ -94,7 +94,7 @@ export default async function ItemPage({
                 // );
 
                 return (
-                  <tr key={v.id} className="align-top hover:bg-gray-50 dark:hover:bg-gray-900">
+                  <tr key={v.id} className="align-top hover:bg-gray-50 dark:hover:bg-gray-800">
                     <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
                       {v.version_number}
                     </td>
